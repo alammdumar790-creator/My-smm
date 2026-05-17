@@ -14,12 +14,14 @@
         .section-title { font-size: 14px; font-weight: 600; color: #9ca3af; margin-bottom: 8px; text-transform: uppercase; }
         select, input { width: 100%; padding: 14px; background: #1f2937; border: 1px solid #374151; color: #ffffff; border-radius: 10px; margin-bottom: 20px; font-size: 15px; }
         select:focus, input:focus { outline: none; border-color: #3b82f6; }
+        input[readonly] { background: #1a2333; color: #10b981; font-weight: 700; border-color: #10b981; }
         .qr-box { text-align: center; background: #1f2937; padding: 20px; border-radius: 14px; border: 2px dashed #3b82f6; margin-bottom: 20px; }
         .qr-status { font-size: 14px; font-weight: 700; color: #ef4444; margin-bottom: 12px; }
         .qr-box img { width: 100%; max-width: 220px; border-radius: 10px; margin: 10px auto; display: block; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .upi-badge { margin-top: 12px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); padding: 10px; border-radius: 8px; display: inline-block; font-weight: bold; color: #60a5fa; font-size: 15px; }
         .btn-submit { width: 100%; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); text-transform: uppercase; }
-        .error-msg { color: #f87171; font-size: 14px; margin-top: -15px; margin-bottom: 15px; display: none; text-align: center; font-weight: 600; }
+        .error-msg { color: #f87171; font-size: 13px; margin-top: -15px; margin-bottom: 15px; font-weight: 600; }
+        .rate-info { font-size: 12px; color: #60a5fa; margin-top: -15px; margin-bottom: 15px; font-weight: 500; }
     </style>
 </head>
 <body>
@@ -31,7 +33,7 @@
     </div>
     
     <div class="section-title">1. Select Service (Service Chunein)</div>
-    <select id="service">
+    <select id="service" onchange="calculatePrice()">
         <option value="Instagram Followers">Instagram Followers</option>
         <option value="Instagram Reels Likes">Instagram Reels Likes</option>
         <option value="Instagram Reels Views">Instagram Reels Views</option>
@@ -40,21 +42,19 @@
     </select>
 
     <div class="section-title">2. Quantity (Kitna Chahiye?)</div>
-    <input type="number" id="quantity" placeholder="Example: 1000, 5000..." value="1000">
+    <input type="number" id="quantity" value="100" oninput="calculatePrice()">
+    <div id="quantity-error" class="error-msg" style="display:none;"></div>
+    <div id="rate-display" class="rate-info">Rate: ₹10 per 100 Followers</div>
 
     <div class="section-title">3. Instagram Username / Link</div>
     <input type="text" id="target" placeholder="Example: Username ya Video ka link...">
 
-    <div class="section-title">4. Enter Amount (Kitne Rupaye Ka Order Hai?)</div>
-    <input type="number" id="amount" placeholder="Minimum ₹10" value="10" oninput="checkAmount()">
-
-    <div id="error-box" class="error-msg">❌ Alert: Minimum order amount must be ₹10!</div>
+    <div class="section-title">4. Total Amount to Pay (₹)</div>
+    <input type="number" id="amount" value="10" readonly>
 
     <div class="qr-box">
         <div class="qr-status">⚠️ SCAN & PAY NOW</div>
-        
         <img id="qr-image" src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=8178085@axl&pn=ABU%20UMAR" alt="Abu Umar PhonePe QR">
-        
         <div class="section-title" style="margin-top:10px; margin-bottom: 2px;">OR PAY VIA UPI ID</div>
         <div class="upi-badge">8178085@axl</div>
     </div>
@@ -66,11 +66,77 @@
 </div>
 
 <script>
-    function checkAmount() {
-        const amount = parseFloat(document.getElementById('amount').value) || 0;
-        const errorBox = document.getElementById('error-box');
-        if (amount < 10) { errorBox.style.display = "block"; } else { errorBox.style.display = "none"; }
+    function calculatePrice() {
+        const service = document.getElementById('service').value;
+        let quantity = parseInt(document.getElementById('quantity').value) || 0;
+        const amountBox = document.getElementById('amount');
+        const errorBox = document.getElementById('quantity-error');
+        const rateBox = document.getElementById('rate-display');
+        
+        errorBox.style.display = "none";
+        let price = 0;
+
+        if (service === "Instagram Followers") {
+            rateBox.innerText = "Rate: ₹10 per 100 Followers (Min: 100, Max: 5000)";
+            if (quantity < 100) {
+                errorBox.innerText = "❌ Minimum 100 followers zaroori hain!";
+                errorBox.style.display = "block";
+            } else if (quantity > 5000) {
+                errorBox.innerText = "❌ Maximum 5000 followers hi allow hain!";
+                errorBox.style.display = "block";
+            }
+            price = (quantity / 100) * 10;
+        } 
+        else if (service === "Instagram Reels Likes") {
+            rateBox.innerText = "Rate: ₹5 per 100 Likes (Max: 100)";
+            if (quantity > 100) {
+                errorBox.innerText = "❌ Maximum limit sirf 100 Likes hai!";
+                errorBox.style.display = "block";
+            } else if (quantity < 10) {
+                errorBox.innerText = "❌ Minimum 10 Likes zaroori hain!";
+                errorBox.style.display = "block";
+            }
+            price = (quantity / 100) * 5;
+        } 
+        else if (service === "Instagram Reels Views") {
+            rateBox.innerText = "Rate: ₹10 per 1000 Views (Max: 1000)";
+            if (quantity > 1000) {
+                errorBox.innerText = "❌ Maximum limit sirf 1000 Views hai!";
+                errorBox.style.display = "block";
+            } else if (quantity < 100) {
+                errorBox.innerText = "❌ Minimum 100 Views zaroori hain!";
+                errorBox.style.display = "block";
+            }
+            price = (quantity / 1000) * 10;
+        } 
+        else if (service === "Instagram Post Views") {
+            rateBox.innerText = "Rate: ₹10 per 1000 Views (Max: 1000)";
+            if (quantity > 1000) {
+                errorBox.innerText = "❌ Maximum limit sirf 1000 Views hai!";
+                errorBox.style.display = "block";
+            } else if (quantity < 100) {
+                errorBox.innerText = "❌ Minimum 100 Views zaroori hain!";
+                errorBox.style.display = "block";
+            }
+            price = (quantity / 1000) * 10;
+        } 
+        else if (service === "Instagram Custom Comments") {
+            rateBox.innerText = "Rate: ₹10 per 10 Comments";
+            if (quantity < 5) {
+                errorBox.innerText = "❌ Minimum 5 Comments zaroori hain!";
+                errorBox.style.display = "block";
+            }
+            price = (quantity / 10) * 10;
+        }
+
+        // Amount update (sirf do decimal tak dikhayega)
+        amountBox.value = price.toFixed(2);
     }
+
+    // Pehli baar page khulne par hisab lagane ke liye
+    window.onload = function() {
+        calculatePrice();
+    };
 
     function placeOrder() {
         const service = document.getElementById('service').value;
@@ -78,9 +144,16 @@
         const target = document.getElementById('target').value;
         const amount = document.getElementById('amount').value;
         const txnId = document.getElementById('txn-id').value;
+        const errorBox = document.getElementById('quantity-error');
 
-        if (parseFloat(amount) < 10) { alert("Bhai, kam se kam ₹10 ka order hona zaroori hai!"); return; }
-        if (!quantity || !target || !txnId || !amount) { alert("Please fill all details correctly before ordering!"); return; }
+        if (errorBox.style.display === "block") {
+            alert("Bhai, pehle quantity ki limit thik karo!");
+            return;
+        }
+        if (!quantity || !target || !txnId || !amount || parseFloat(amount) <= 0) { 
+            alert("Please fill all details correctly before ordering!"); 
+            return; 
+        }
 
         const message = `👋 *NEW SMM ORDER RECEIVED* 👋%0A%0A` +
                         `👤 *Service:* ${service}%0A` +
