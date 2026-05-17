@@ -30,25 +30,28 @@
         <p>Super Fast & Super Cheap Social Media Services</p>
     </div>
     
-    <div class="section-title">1. Choose Service</div>
+    <div class="section-title">1. Select Service (Service Chunein)</div>
     <select id="service">
-        <option value="followers">Instagram Followers (Premium Quality)</option>
-        <option value="likes">Instagram Likes (High Speed)</option>
-        <option value="views">Instagram Video Views (Instant)</option>
-        <option value="comments">Instagram Custom Comments</option>
+        <option value="Instagram Followers">Instagram Followers</option>
+        <option value="Instagram Reels Likes">Instagram Reels Likes</option>
+        <option value="Instagram Reels Views">Instagram Reels Views</option>
+        <option value="Instagram Post Views">Instagram Post Views</option>
+        <option value="Instagram Custom Comments">Instagram Custom Comments</option>
     </select>
 
-    <div class="section-title">2. Instagram Link / Username</div>
-    <input type="text" id="target" placeholder="e.g., alex_umar or post url...">
+    <div class="section-title">2. Instagram Username / Link</div>
+    <input type="text" id="target" placeholder="Example: Username ya Video ka link dalein...">
 
-    <div class="section-title">3. Enter Amount (₹)</div>
+    <div class="section-title">3. Enter Amount (Kitne Rupaye Ka Order Hai?)</div>
     <input type="number" id="amount" placeholder="Minimum ₹10" value="10" oninput="checkAmount()">
 
     <div id="error-box" class="error-msg">❌ Alert: Minimum order amount must be ₹10!</div>
 
     <div class="qr-box">
-        <div class="qr-status">⚠️ SCAN & PAY (ABU UMAR)</div>
-        <img id="qr-image" src="https://alammdumar790-creator.github.io/My-smm/AccountQRCodeInd.jpeg" alt="QR Code" onerror="this.src='AccountQRCodeInd.jpeg'">
+        <div class="qr-status">⚠️ SCAN & PAY NOW</div>
+        
+        <img id="qr-image" src="2708.png" alt="QR Code" onerror="this.src='https://alammdumar790-creator.github.io/My-smm/2708.png'">
+        
         <div class="section-title" style="margin-top:10px; margin-bottom: 2px;">OR PAY VIA UPI ID</div>
         <div class="upi-badge">8178085@axl</div>
     </div>
@@ -73,28 +76,19 @@
         const txnId = document.getElementById('txn-id').value;
 
         if (parseFloat(amount) < 10) { alert("Bhai, kam se kam ₹10 ka order hona zaroori hai!"); return; }
-        
-        // Agar details khali hongi toh hi alert aayega
         if (!target || !txnId || !amount) { alert("Please fill all details correctly before ordering!"); return; }
 
         const message = `👋 *NEW SMM ORDER RECEIVED* 👋%0A%0A` +
-                        `👤 *Service:* ${service.toUpperCase()}%0A` +
+                        `👤 *Service:* ${service}%0A` +
                         `🔗 *Target/Username:* ${target}%0A` +
                         `💰 *Amount Paid:* ₹${amount}%0A` +
                         `🆔 *UTR / Txn ID:* ${txnId}`;
 
         const myWhatsAppNumber = "918178085392"; 
-        
-        // Sabse best universal web+app link
-        const whatsappUrl = `https://web.whatsapp.com/send?phone=${myWhatsAppNumber}&text=${message}`;
         const fallbackUrl = `https://wa.me/${myWhatsAppNumber}?text=${message}`;
         
-        // Dono tarike se try karega taaki phone me glitch na aaye
-        if(navigator.userAgent.includes("Android") || navigator.userAgent.includes("iPhone")) {
-            window.location.href = fallbackUrl;
-        } else {
-            window.open(whatsappUrl, '_blank');
-        }
+        // Android/iPhone ke liye bina glitch ke direct redirect
+        window.location.href = fallbackUrl;
     }
 </script>
 
