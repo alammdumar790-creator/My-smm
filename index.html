@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alex SMM Panel - Cheap & Fast</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #161b22;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border: 1px solid #30363d;
+        }
+        h2 {
+            text-align: center;
+            color: #58a6ff;
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .section-title {
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #8b949e;
+        }
+        select, input {
+            width: 100%;
+            padding: 12px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #fff;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #58a6ff;
+        }
+        .qr-box {
+            text-align: center;
+            background: #21262d;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed #58a6ff;
+            margin-bottom: 15px;
+        }
+        .qr-box img {
+            max-width: 180px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .price-display {
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid #58a6ff;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #58a6ff;
+            margin-bottom: 20px;
+        }
+        .btn-submit {
+            width: 100%;
+            background: #238636;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-submit:hover {
+            background: #2ea043;
+        }
+        .error-msg {
+            color: #ff7b72;
+            font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Alex SMM Panel</h2>
+    
+    <!-- 1. Service Selection -->
+    <div class="section-title">Select Service (Service Chunein)</div>
+    <select id="service" onchange="updatePrice()">
+        <option value="followers" data-rate="50">Instagram Followers (₹50 per 1000)</option>
+        <option value="likes" data-rate="15">Instagram Likes (₹15 per 1000)</option>
+        <option value="views" data-rate="10">Instagram Video Views (₹10 per 1000)</option>
+        <option value="comments" data-rate="40">Instagram Custom Comments (₹40 per 1000)</option>
+    </select>
+
+    <!-- 2. Quantity Input -->
+    <div class="section-title">Quantity (Kitna Chahiye)</div>
+    <input type="number" id="quantity" placeholder="Example: 1000" value="1000" min="100" oninput="updatePrice()">
+
+    <!-- 3. Target Link / Username -->
+    <div class="section-title">Instagram Username / Post Link</div>
+    <input type="text" id="target" placeholder="Example: alex_umar or post_link...">
+
+    <!-- 4. Price Display -->
+    <div class="price-display">
+        Total Price: ₹<span id="total-price">50</span>
+    </div>
+
+    <!-- Error Message for Min ₹10 -->
+    <div id="error-box" class="error-msg">❌ Panga mat lo bhai! Minimum order ₹10 ka hona chahiye.</div>
+
+    <!-- 5. QR Code Payment Box -->
+    <div class="qr-box">
+        <div style="font-weight: bold; color: #ff7b72;">⚠️ Pehle Scan Karke Pay Karein, Phir Order Karein!</div>
+        <!-- Apne QR Code ki image ka link niche src="" me dalein -->
+        <img id="qr-image" src="https://via.placeholder.com/150?text=Apna+QR+Code+Lagayein" alt="Pay TM / PhonePe QR">
+        <div style="margin-top: 8px; font-size: 13px; color: #8b949e;">Utrant payment ke baad niche Submit karein</div>
+    </div>
+
+    <!-- 6. Payment Transaction ID -->
+    <div class="section-title">Payment Transaction ID / UTR No.</div>
+    <input type="text" id="txn-id" placeholder="Enter 12 digit Transaction ID">
+
+    <!-- 7. Order Button -->
+    <button class="btn-submit" onclick="placeOrder()">Place Order (WhatsApp Par Bheinjen)</button>
+</div>
+
+<script>
+    // Live price calculate karne ke liye function
+    function updatePrice() {
+        const serviceSelect = document.getElementById('service');
+        const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+        const ratePerThousand = parseFloat(selectedOption.getAttribute('data-rate'));
+        const quantity = parseInt(document.getElementById('quantity').value) || 0;
+        
+        // Price Calculation Formula
+        const totalPrice = (ratePerThousand / 1000) * quantity;
+        
+        document.getElementById('total-price').innerText = totalPrice.toFixed(2);
+        
+        // Agar price 10 se kam hai to warning chhupao/dikhao
+        const errorBox = document.getElementById('error-box');
+        if (totalPrice < 10 && quantity > 0) {
+            errorBox.style.display = "block";
+        } else {
+            errorBox.style.display = "none";
+        }
+    }
+
+    // Order submit karne ka function
+    function placeOrder() {
+        const service = document.getElementById('service').value;
+        const quantity = document.getElementById('quantity').value;
+        const target = document.getElementById('target').value;
+        const price = document.getElementById('total-price').innerText;
+        const txnId = document.getElementById('txn-id').value;
+
+        // 1. Check Minimum ₹10 Limit
+        if (parseFloat(price) < 10) {
+            alert("Bhai, kam se kam ₹10 ka order hona zaroori hai!");
+            return;
+        }
+
+        // 2. Check Input Fields Empty toh nahi hain
+        if (!target || !txnId || !quantity) {
+            alert("Sari details bhariye (Username aur Transaction ID zaroori hai)!");
+            return;
+        }
+
+        // 3. WhatsApp Message Format Taiyar Karna
+        const message = `👋 *NEW SMM ORDER* 👋%0A%0A` +
+                        `👤 *Service:* ${service.toUpperCase()}%0A` +
+                        `🔢 *Quantity:* ${quantity}%0A` +
+                        `🔗 *Target:* ${target}%0A` +
+                        `💰 *Paid Amount:* ₹${price}%0A` +
+                        `🆔 *Txn ID:* ${txnId}`;
+
+        // Apne WhatsApp number ke saath link (Niche apna number badal lena)
+        const myWhatsAppNumber = "919999999999"; // <-- Yahan apna Number dalo country code ke sath
+        const whatsappUrl = `https://wa.me/${myWhatsAppNumber}?text=${message}`;
+
+        // User ko WhatsApp par redirect karna
+        window.open(whatsappUrl, '_blank');
+    }
+    
+    // Page load hote hi ek baar price check chal jaye
+    window.onload = updatePrice;
+</script>
+
+</body>
+</html>
